@@ -5,7 +5,7 @@ local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
 local Window = Library:CreateWindow({
-	Title = [[deivid ui <font transparency="0.5">| deivid has ballers</font>]],
+	Title = [[deivid ui <font transparency="0.5">| deivid has no ballers</font>]],
 	TopTabBar = true,
 	TweenTime = 0.1,
 
