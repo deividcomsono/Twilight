@@ -3398,8 +3398,9 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 		end
 
 		--// Execution \\--
-		local Offset = Icon and 16 or 0
-		TabButton.Size = UDim2.new(0, TabButton.TextBounds.X + 48 + Offset, 1, 0)
+		local TextSizeX = Library:GetTextBounds(TabButton.Text, TabButton.FontFace, TabButton.TextSize)
+		local IconOffset = Icon and 16 or 0
+		TabButton.Size = UDim2.new(0, TextSizeX + IconOffset + 48, 1, 0)
 
 		if not Window.ActiveTab then
 			Window.ActiveTab = Tab
