@@ -889,7 +889,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 		--// Tab Table \\--
 		local Tab = {} :: TabTable
 
-		function Tab:CreateSection(SectionName: string)
+		function Tab:CreateSection(SectionName: string, Opened: boolean?)
 			local SectionButton
 			local SectionArrow
 			local Container
@@ -966,6 +966,10 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			function Section:Toggle()
 				Container.Visible = not Container.Visible
 				SectionArrow.Rotation = Container.Visible and 180 or 0
+			end
+
+			if Opened then
+				Section:Show()
 			end
 
 			--// Elements \\--
@@ -3113,7 +3117,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Colorpicker.Description
 				end
 				Library.Flags[Flag] = Colorpicker
-                		Library.Options[Flag] = Colorpicker
+				Library.Options[Flag] = Colorpicker
 
 				Colorpicker:SetValue(Colorpicker.Value, ColorpickerInfo.SkipInitialCallback)
 				Colorpicker:UpdatePosition()
