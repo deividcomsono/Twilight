@@ -3113,7 +3113,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Colorpicker.Description
 				end
 				Library.Flags[Flag] = Colorpicker
-                Library.Options[Flag] = Colorpicker
+                		Library.Options[Flag] = Colorpicker
 
 				Colorpicker:SetValue(Colorpicker.Value, ColorpickerInfo.SkipInitialCallback)
 				Colorpicker:UpdatePosition()
