@@ -28,7 +28,7 @@ local Window = Library:CreateWindow({
 local Main = Window:CreateTab("Main")
 local Settings = Window:CreateTab("Settings")
 
-local ShowcaseSec = Main:CreateSection("Showcase")
+local ShowcaseSec = Main:CreateSection("Showcase", true) --true: Section Opened for default
 
 ShowcaseSec:CreateLabel("Label", {
 	Text = "This is a Label\n<font transparency='0'>It has Rich Text Enabled</font>\n<font size='14'>Tiny Size!</font>",
