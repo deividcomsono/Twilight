@@ -855,9 +855,10 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 	local Window = {}
 	Window.ActiveTab = nil :: TabTable | nil
 
-	function Window:CreateTab(TabName: string)
+	function Window:CreateTab(TabName: string, IconName: string?)
 		local TabButton
 		local TabStroke
+		local Icon
 		local TabContainer
 		do
 			TabButton = New("TextButton", {
@@ -871,11 +872,34 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 				Parent = TabButtons,
 			})
 
+			New("UIPadding", {
+				PaddingLeft = UDim.new(0, 16),
+				PaddingRight = UDim.new(0, 16),
+				Parent = TabButton,
+			})
+
 			TabStroke = New("UIStroke", {
 				Color = "BorderColor",
 				Transparency = 1,
 				Parent = TabButton,
 			})
+
+			local IconAsset = IconName and GetIcon(IconName)
+			if IconAsset then
+				TabButton.TextXAlignment = Enum.TextXAlignment.Right
+
+				Icon = New("ImageLabel", {
+					AnchorPoint = Vector2.new(0, 0.5),
+					BackgroundTransparency = 1,
+					Image = IconAsset.Url,
+					ImageRectSize = IconAsset.ImageRectSize,
+					ImageRectOffset = IconAsset.ImageRectOffset,
+					ImageTransparency = 0.5,
+					Position = UDim2.fromScale(0, 0.5),
+					Size = UDim2.fromOffset(18, 18),
+					Parent = TabButton,
+				})
+			end
 
 			TabContainer = New("ScrollingFrame", {
 				AutomaticCanvasSize = Enum.AutomaticSize.Y,
@@ -3317,6 +3341,11 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			TweenService:Create(TabStroke, WindowTweenInfo, {
 				Transparency = Hovering and 0.5 or 1,
 			}):Play()
+			if Icon then
+				TweenService:Create(Icon, WindowTweenInfo, {
+					ImageTransparency = Hovering and 0.25 or 0.5,
+				}):Play()
+			end
 		end
 
 		function Tab:Show()
@@ -3329,6 +3358,11 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			TweenService:Create(TabStroke, WindowTweenInfo, {
 				Transparency = 0,
 			}):Play()
+			if Icon then
+				TweenService:Create(Icon, WindowTweenInfo, {
+					ImageTransparency = 0,
+				}):Play()
+			end
 		end
 
 		function Tab:Hide()
@@ -3341,6 +3375,11 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			TweenService:Create(TabStroke, WindowTweenInfo, {
 				Transparency = 1,
 			}):Play()
+			if Icon then
+				TweenService:Create(Icon, WindowTweenInfo, {
+					ImageTransparency = 0.5,
+				}):Play()
+			end
 		end
 
 		function Tab:Set()
@@ -3354,7 +3393,8 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 		end
 
 		--// Execution \\--
-		TabButton.Size = UDim2.new(0, TabButton.TextBounds.X + 48, 1, 0)
+		local Offset = Icon and 16 or 0
+		TabButton.Size = UDim2.new(0, TabButton.TextBounds.X + 48 + Offset, 1, 0)
 
 		if not Window.ActiveTab then
 			Window.ActiveTab = Tab
