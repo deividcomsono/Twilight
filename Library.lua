@@ -589,6 +589,7 @@ New("UIListLayout", {
 })
 
 local ButtonIcon = GetIcon("chevron-right")
+local OpenIcon = GetIcon("chevron-down")
 
 --// Lib Functions \\--
 function Library:AddThemeTag(ThemeTag: string, Instance: GuiObject, Property: string)
@@ -965,7 +966,9 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 
 				SectionArrow = New("ImageLabel", {
 					AnchorPoint = Vector2.new(1, 0),
-					Image = "rbxassetid://105228422307430",
+					Image = OpenIcon and OpenIcon.Url or "rbxassetid://105228422307430",
+					ImageRectSize = OpenIcon and OpenIcon.ImageRectSize or 0,
+					ImageRectOffset = OpenIcon and OpenIcon.ImageRectOffset or 0,
 					ImageColor3 = "FillColor",
 					Position = UDim2.fromScale(1, 0),
 					Size = UDim2.fromOffset(WindowInfo.SectionFontSize + 2, WindowInfo.SectionFontSize + 2),
@@ -2277,8 +2280,10 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 				local DropdownArrow = New("ImageLabel", {
 					AnchorPoint = Vector2.new(1, 0),
 					BackgroundTransparency = 1,
-					Image = "rbxassetid://105228422307430",
+					Image = OpenIcon and OpenIcon.Url or "rbxassetid://105228422307430",
 					ImageColor3 = "FillColor",
+					ImageRectSize = OpenIcon and OpenIcon.ImageRectSize or 0,
+					ImageRectOffset = OpenIcon and OpenIcon.ImageRectOffset or 0,
 					Position = UDim2.fromScale(1, 0),
 					Size = UDim2.fromScale(1, 1),
 					SizeConstraint = Enum.SizeConstraint.RelativeYY,
