@@ -25,7 +25,8 @@ local Window = Library:CreateWindow({
     ]]
 })
 
-local Main = Window:CreateTab("Main")
+-- Twilight uses Lucide Icons v0.363.0 by https://github.com/latte-soft/lucide-roblox
+local Main = Window:CreateTab("Main", "home") --home: Lucide Icon for Tab (optional)
 local Settings = Window:CreateTab("Settings")
 
 local ShowcaseSec = Main:CreateSection("Showcase", true) --true: Section Opened for default
