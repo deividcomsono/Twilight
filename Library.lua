@@ -534,6 +534,22 @@ local function Validate(Table: { [string]: any }, Template: { [string]: any }): 
 	return Table
 end
 
+local FetchIcons, Icons = pcall(function()
+	return loadstring(
+		game:HttpGet("https://github.com/latte-soft/lucide-roblox/releases/latest/download/lucide-roblox.luau")
+	)()
+end)
+local function GetIcon(IconName: string)
+	if not FetchIcons then
+		return
+	end
+	local Success, Icon = pcall(Icons.GetAsset, IconName, 48)
+	if not Success then
+		return
+	end
+	return Icon
+end
+
 local function ParentUI(UI: Instance)
 	if not pcall(function()
 		UI.Parent = gethui and gethui() or CoreGui
@@ -571,6 +587,8 @@ New("UIListLayout", {
 	VerticalAlignment = Enum.VerticalAlignment.Bottom,
 	Parent = NotificationsFrame,
 })
+
+local ButtonIcon = GetIcon("chevron-right")
 
 --// Lib Functions \\--
 function Library:AddThemeTag(ThemeTag: string, Instance: GuiObject, Property: string)
@@ -1087,6 +1105,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Text = ButtonInfo.Title,
 					TextSize = WindowInfo.FontSize,
 					TextTransparency = 0.5,
+					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = ButtonFrame,
 				})
 
@@ -1099,8 +1118,23 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Text = "",
 					TextSize = 14,
 					TextTransparency = 0.6,
+					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = ButtonFrame,
 				})
+
+				if ButtonIcon then
+					New("ImageLabel", {
+						AnchorPoint = Vector2.new(1, 0),
+						BackgroundTransparency = 1,
+						Image = ButtonIcon.Url,
+						ImageRectSize = ButtonIcon.ImageRectSize,
+						ImageRectOffset = ButtonIcon.ImageRectOffset,
+						ImageTransparency = 0.5,
+						Position = UDim2.fromScale(1, 0),
+						Size = UDim2.fromOffset(20, 20),
+						Parent = ButtonFrame,
+					})
+				end
 
 				--// Button Table \\--
 				local Button = {
