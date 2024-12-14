@@ -10,10 +10,15 @@ local Library = {
 	IsMobile = UserInputService.TouchEnabled,
 
 	ScreenGui = nil,
-	Flags = {},
 	ToggleKeybind = Enum.KeyCode.RightControl,
 	Opened = true,
 	Unloaded = false,
+
+	Flags = {},
+	Labels = {},
+	Buttons = {},
+	Toggles = {},
+	Options = {},
 
 	Connections = {},
 	UnloadCallbacks = {},
@@ -1043,6 +1048,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 				end
 
 				Library.Flags[Flag] = Label
+				Library.Labels[Flag] = Label
 				Label:SetText(Label.Text)
 
 				return Label
@@ -1122,6 +1128,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Button.Description
 				end
 				Library.Flags[Flag] = Button
+				Library.Buttons[Flag] = Button
 
 				--// Execution \\--
 				ButtonFrame.MouseEnter:Connect(function()
@@ -1333,6 +1340,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					end
 
 					Library.Flags[Flag] = Slider
+					Library.Options[Flag] = Slider
 					Slider:SetValue(SliderInfo.Value, SliderInfo.SkipInitialCallback)
 
 					--// Execution \\--
@@ -1575,6 +1583,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					end
 
 					Library.Flags[Flag] = Keypicker
+					Library.Options[Flag] = Keypicker
 					Keypicker:SetKeybind(Keypicker.Keybind)
 					Keypicker:UpdatePosition()
 
@@ -1714,6 +1723,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Toggle.Description
 				end
 				Library.Flags[Flag] = Toggle
+				Library.Toggles[Flag] = Toggle
 				Toggle:SetValue(Toggle.Value, ToggleInfo.SkipInitialCallback)
 
 				--// Execution \\--
@@ -1900,6 +1910,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Slider.Description
 				end
 				Library.Flags[Flag] = Slider
+				Library.Options[Flag] = Slider
 				Slider:SetValue(SliderInfo.Value, SliderInfo.SkipInitialCallback)
 
 				--// Execution \\--
@@ -2101,6 +2112,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Input.Description
 				end
 				Library.Flags[Flag] = Input
+				Library.Options[Flag] = Input
 				Input:SetValue(Input.Value, InputInfo.SkipInitialCallback)
 
 				--// Execution \\--
@@ -2470,6 +2482,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Dropdown.Description
 				end
 				Library.Flags[Flag] = Dropdown
+				Library.Options[Flag] = Dropdown
 				if typeof(Dropdown.Value) == "table" then
 					local Table = {}
 
@@ -2747,6 +2760,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Keypicker.Description
 				end
 				Library.Flags[Flag] = Keypicker
+				Library.Options[Flag] = Keypicker
 				Keypicker:SetKeybind(Keypicker.Keybind)
 				Keypicker:UpdatePosition()
 
@@ -3099,6 +3113,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					DescLabel.Text = Colorpicker.Description
 				end
 				Library.Flags[Flag] = Colorpicker
+                Library.Options[Flag] = Colorpicker
 
 				Colorpicker:SetValue(Colorpicker.Value, ColorpickerInfo.SkipInitialCallback)
 				Colorpicker:UpdatePosition()
