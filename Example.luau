@@ -7,21 +7,21 @@ local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 local Window = Library:CreateWindow({
 	Title = [[deivid ui <font transparency="0.5">| deivid has ballers</font>]],
 	TopTabBar = true,
-	TweenTime = 0.1,
 
-	--[[
-        Title: string,
-        TopTabBar: boolean,
-        OutlineThickness: number,
-        Width: number,
-        Height: number,
-        Font: Font,
-        FontSize: number,
-        SectionFontSize: number,
-        MaxDropdownItems: number,
-        Theme: Themes,
-        TweenTime: number,
-        ToggleKeybind: Enum.KeyCode,
+	--[[Default:
+        Title = "Template",
+        TopTabBar = false,
+        OutlineThickness = 2,
+        Width = 700,
+        Height = 700,
+        Font = Font.fromEnum(Enum.Font.Code),
+        FontSize = 16,
+        SectionFontSize = 18,
+        MaxDialogButtonsPerLine = 4,
+        MaxDropdownItems = 8,
+        Theme = nil,
+        TweenTime = 0.1,
+        ToggleKeybind = Enum.KeyCode.RightControl,
     ]]
 })
 
@@ -45,6 +45,31 @@ local Button = ShowcaseSec:CreateButton("Button", {
 			Title = "Cool Title",
 			Content = "Cool Content with <b>Cool Rich Text!</b>",
 			Duration = 6,
+		})
+
+		Window:CreateDialog({
+			Title = "Cool Title",
+			Content = "Cool Content!!!",
+			Buttons = {
+				{
+					Title = "Confirm",
+					Callback = function()
+						print("Confirmed")
+					end,
+				},
+				{
+					Title = "Cancel",
+					Callback = function()
+						print("Cancelled")
+					end,
+				},
+				{
+					Title = "...",
+					Callback = function()
+						print("...")
+					end,
+				},
+			},
 		})
 	end,
 })
