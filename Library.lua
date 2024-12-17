@@ -92,10 +92,20 @@ local Templates = {
 		Font = Enum.Font.Code,
 		FontSize = 16,
 		SectionFontSize = 18,
+		MaxDialogButtonsPerLine = 4,
 		MaxDropdownItems = 8,
 		Theme = Library.Theme,
 		TweenTime = 0.1,
 		ToggleKeybind = Enum.KeyCode.RightControl,
+	},
+	Dialog = {
+		Title = "Title",
+		Content = "Content",
+		Buttons = {
+			{
+				Title = "Close",
+			},
+		},
 	},
 	Label = {
 		Alignment = Enum.TextXAlignment.Left,
@@ -155,10 +165,17 @@ export type WindowInfo = {
 	Font: Font,
 	FontSize: number,
 	SectionFontSize: number,
+	MaxDialogButtonsPerLine: number,
 	MaxDropdownItems: number,
 	Theme: Themes,
 	TweenTime: number,
 	ToggleKeybind: Enum.KeyCode,
+}
+
+export type DialogInfo = {
+	Title: string,
+	Content: string,
+	Buttons: { [any]: any },
 }
 
 export type TabTable = {
@@ -494,11 +511,11 @@ end
 
 local function FillInstance(Table: { [string]: any }, Instance: GuiObject)
 	--[[
-        Example:
-        TextColor3 = "FontColor"
-        k = "TextColor3" = Property
-        v = "FontColor" = Theme
-    ]]
+		Example:
+		TextColor3 = "FontColor"
+		k = "TextColor3" = Property
+		v = "FontColor" = Theme
+	]]
 	for k, v in pairs(Table) do
 		if Library.Theme[v] then
 			Instance[k] = Library.Theme[v]
@@ -560,6 +577,7 @@ end
 
 --// Main Instances \\-
 local ScreenGui = New("ScreenGui", {
+	Name = "Twilight",
 	ResetOnSpawn = false,
 })
 ParentUI(ScreenGui)
@@ -567,6 +585,7 @@ Library.ScreenGui = ScreenGui
 
 local MainFrame = New("Frame", {
 	BackgroundTransparency = 1,
+	Name = "Main",
 	Position = UDim2.fromOffset(0, 0),
 	Size = UDim2.fromOffset(0, 0),
 	Parent = ScreenGui,
@@ -575,6 +594,7 @@ local MainFrame = New("Frame", {
 local NotificationsFrame = New("Frame", {
 	AnchorPoint = Vector2.new(1, 0.5),
 	BackgroundTransparency = 1,
+	Name = "Notifications",
 	Position = UDim2.new(1, -8, 0.5, 0),
 	Size = UDim2.new(0, 300, 1, -16),
 	ZIndex = 2,
@@ -788,6 +808,14 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 	local TitleBar
 	local TabButtons
 	local TabsContainer
+
+	local DialogHolder
+	local DialogFrame
+	local DialogTitle: TextLabel
+	local DialogContent: TextLabel
+	local DialogButtons
+	local DialogGrid: UIGridLayout
+
 	do
 		MainFrame.Position = UDim2.fromOffset(
 			(ViewportSize.X - WindowInfo.Width) / 2,
@@ -850,11 +878,162 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			Size = UDim2.new(1, 0, 1, -74),
 			Parent = MainFrame,
 		})
+
+		--// Dialog \\--
+		DialogHolder = New("TextButton", {
+			BackgroundColor3 = Color3.new(),
+			BackgroundTransparency = 0.6,
+			Size = UDim2.fromScale(1, 1),
+			Text = "",
+			Visible = false,
+			ZIndex = 2,
+			Parent = MainFrame,
+		})
+
+		DialogFrame = New("Frame", {
+			AnchorPoint = Vector2.new(0.5, 0.5),
+			BackgroundColor3 = "SectionColor",
+			Position = UDim2.fromScale(0.5, 0.5),
+			Size = UDim2.fromScale(0.75, 0.4),
+			ZIndex = 2,
+			Parent = DialogHolder,
+		})
+
+		New("UIPadding", {
+			PaddingBottom = UDim.new(0, 8),
+			PaddingLeft = UDim.new(0, 8),
+			PaddingRight = UDim.new(0, 8),
+			PaddingTop = UDim.new(0, 8),
+			Parent = DialogFrame,
+		})
+
+		New("UIStroke", {
+			Color = "BorderColor",
+			Parent = DialogFrame,
+		})
+
+		DialogTitle = New("TextLabel", {
+			BackgroundTransparency = 1,
+			FontFace = WindowInfo.Font,
+			Size = UDim2.fromScale(1, 0),
+			Text = "",
+			TextSize = 24,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			ZIndex = 2,
+			Parent = DialogFrame,
+		})
+
+		DialogContent = New("TextLabel", {
+			BackgroundTransparency = 1,
+			FontFace = WindowInfo.Font,
+			Size = UDim2.fromScale(1, 0),
+			Text = "",
+			TextSize = 18,
+			TextTransparency = 0.5,
+			TextXAlignment = Enum.TextXAlignment.Left,
+			ZIndex = 2,
+			Parent = DialogFrame,
+		})
+
+		DialogButtons = New("Frame", {
+			AnchorPoint = Vector2.new(0, 1),
+			BackgroundTransparency = 1,
+			Position = UDim2.fromScale(0, 1),
+			Size = UDim2.new(1, 0, 0, 32),
+			ZIndex = 2,
+			Parent = DialogFrame,
+		})
+
+		DialogGrid = New("UIGridLayout", {
+			CellPadding = UDim2.fromOffset(9, 9),
+			CellSize = UDim2.fromOffset(0, 32),
+			HorizontalAlignment = Enum.HorizontalAlignment.Center,
+			Parent = DialogButtons,
+		})
 	end
 
 	--// Window Table \\--
 	local Window = {}
 	Window.ActiveTab = nil :: TabTable | nil
+
+	function Window:CreateDialog(DialogInfo: DialogInfo)
+		DialogInfo = Validate(DialogInfo, Templates.Dialog)
+
+		local _, TitleY = Library:GetTextBounds(
+			DialogInfo.Title,
+			DialogTitle.FontFace,
+			DialogTitle.TextSize,
+			DialogFrame.AbsoluteSize.X - 16
+		)
+		DialogTitle.Size = UDim2.new(1, 0, 0, TitleY)
+		DialogTitle.Text = DialogInfo.Title
+
+		local _, ContentY = Library:GetTextBounds(
+			DialogInfo.Content,
+			DialogContent.FontFace,
+			DialogContent.TextSize,
+			DialogFrame.AbsoluteSize.X - 16
+		)
+		DialogContent.Position = UDim2.fromOffset(0, TitleY)
+		DialogContent.Size = UDim2.new(1, 0, 0, ContentY)
+		DialogContent.Text = DialogInfo.Content
+
+		local Amount = GetTableSize(DialogInfo.Buttons)
+		local ClampedAmount = math.clamp(Amount, 0, WindowInfo.MaxDialogButtonsPerLine)
+		local Quantity = math.ceil(Amount / WindowInfo.MaxDialogButtonsPerLine)
+
+		local ButtonsY = (32 * Quantity) + (9 * (Quantity - 1))
+		DialogButtons.Size = UDim2.new(1, 0, 0, ButtonsY)
+		DialogGrid.CellSize = UDim2.new(1 / ClampedAmount, -(3 + ClampedAmount), 0, 32)
+
+		for _, ButtonInfo in pairs(DialogInfo.Buttons) do
+			local Button = New("TextButton", {
+				BackgroundColor3 = "ButtonColor",
+				FontFace = WindowInfo.Font,
+				Text = ButtonInfo.Title,
+				TextSize = 18,
+				TextTransparency = 0.5,
+				ZIndex = 2,
+				Parent = DialogButtons,
+			})
+
+			local Stroke = New("UIStroke", {
+				Color = "BorderColor",
+				Transparency = 0.5,
+				Parent = Button,
+			})
+
+			Button.MouseEnter:Connect(function()
+				TweenService:Create(Button, WindowTweenInfo, {
+					TextTransparency = 0.25,
+				}):Play()
+				TweenService:Create(Stroke, WindowTweenInfo, {
+					Transparency = 0,
+				}):Play()
+			end)
+			Button.MouseLeave:Connect(function()
+				TweenService:Create(Button, WindowTweenInfo, {
+					TextTransparency = 0.5,
+				}):Play()
+				TweenService:Create(Stroke, WindowTweenInfo, {
+					Transparency = 0.5,
+				}):Play()
+			end)
+			Button.MouseButton1Click:Connect(function()
+				DialogHolder.Visible = false
+				for _, Button in pairs(DialogButtons:GetChildren()) do
+					if Button.ClassName == "TextButton" then
+						Button:Destroy()
+					end
+				end
+
+				Library:SafeCallback(Button.Callback)
+			end)
+		end
+
+		DialogFrame.Size = UDim2.new(0.75, 0, 0, TitleY + ContentY + ButtonsY + 22)
+		DialogHolder.Visible = true
+	end
 
 	function Window:CreateTab(TabName: string, IconName: string?)
 		local TabButton
@@ -1561,7 +1740,6 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 						)
 						KeybindButton.Size = UDim2.fromOffset(X + 8, 20)
 						if Toggle.Slider then
-							print("hello")
 							Toggle.Slider.SliderValue.Size = UDim2.new(1, -(X + 42), 0, 20)
 						end
 					end
