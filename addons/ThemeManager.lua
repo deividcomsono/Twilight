@@ -11,6 +11,12 @@ local ThemeManager = {
 				'{"FillColor":"5a5a5a","SectionColor":"141414","FontColor":"ffffff","TitleBarColor":"0a0a0a","ButtonColor":"191919","FillBorderColor":"3c3c3c","BorderColor":"2d2d2d","TabBarColor":"0a0a0a","ContainerColor":"0f0f0f"}'
 			),
 		},
+		Deivid = {
+			2,
+			HttpService:JSONDecode(
+				'{"FillColor":"303035","SectionColor":"18181d","FontColor":"ffffff","TitleBarColor":"141419","ButtonColor":"1c1c21","FillBorderColor":"343439","BorderColor":"202025","TabBarColor":"141419","ContainerColor":"141419"}'
+			),	
+		},
 	},
 }
 
