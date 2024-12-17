@@ -1027,7 +1027,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					end
 				end
 
-				Library:SafeCallback(Button.Callback)
+				Library:SafeCallback(ButtonInfo.Callback)
 			end)
 		end
 
