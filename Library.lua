@@ -918,7 +918,6 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			Size = UDim2.fromScale(1, 0),
 			Text = "",
 			TextSize = 24,
-			TextWrapped = true,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			ZIndex = 2,
 			Parent = DialogFrame,
@@ -931,7 +930,6 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			Text = "",
 			TextSize = 18,
 			TextTransparency = 0.5,
-			TextWrapped = true,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			ZIndex = 2,
 			Parent = DialogFrame,
@@ -3606,6 +3604,14 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			Library.Opened = not Library.Opened
 		end
 		MainFrame.Visible = Library.Opened
+
+		for _, Option in pairs(Library.Options) do
+			if Option.Type == "Keypicker" then
+				Option:HideConfig()
+			elseif Option.Type == "Dropdown" or Option.Type == "Colorpicker" then
+				Option:Hide()
+			end
+		end
 	end
 
 	--// Execution \\--
@@ -3652,9 +3658,9 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 	local function PlayerUpdate()
 		local PlayersTable = Players:GetPlayers()
 
-		for _, Flag: DropdownTable in pairs(Library.Flags) do
-			if Flag.SpecialType and Flag.SpecialType == "Player" then
-				Flag:SetValues(PlayersTable)
+		for _, Dropdown: DropdownTable in pairs(Library.Options) do
+			if Dropdown.Type == "Dropdown" and Dropdown.SpecialType == "Player" then
+				Dropdown:SetValues(PlayersTable)
 			end
 		end
 	end
