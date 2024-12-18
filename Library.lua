@@ -610,6 +610,7 @@ New("UIListLayout", {
 
 local ButtonIcon = GetIcon("chevron-right")
 local OpenIcon = GetIcon("chevron-down")
+local ResizeIcon = GetIcon("move-diagonal")
 
 --// Lib Functions \\--
 function Library:AddThemeTag(ThemeTag: string, Instance: GuiObject, Property: string)
@@ -716,6 +717,59 @@ function Library:MakeDraggable(UI: GuiObject, DragFrame: GuiObject, IgnoreOpened
 	end))
 end
 
+function Library:MakeResizable(UI: GuiObject, ResizeFrame: GuiObject, IgnoreOpened: boolean?)
+	local StartPos
+	local FramePos
+	local FrameSize
+	local Dragging = false
+	local Changed
+	ResizeFrame.InputBegan:Connect(function(Input: InputObject)
+		if not IsClickInput(Input) then
+			return
+		end
+
+		StartPos = Input.Position
+		FramePos = UI.Position
+		FrameSize = UI.Size
+		Dragging = true
+
+		Changed = Input.Changed:Connect(function()
+			if Input.UserInputState ~= Enum.UserInputState.End then
+				return
+			end
+
+			Dragging = false
+			if Changed and Changed.Connected then
+				Changed:Disconnect()
+				Changed = nil
+			end
+		end)
+	end)
+	Library:Connect(UserInputService.InputChanged:Connect(function(Input: InputObject)
+		if not IgnoreOpened and not Library.Opened or Library.Unloaded then
+			Dragging = false
+			if Changed and Changed.Connected then
+				Changed:Disconnect()
+				Changed = nil
+			end
+
+			return
+		end
+
+		if Dragging and IsHoverInput(Input) then
+			local Delta = Input.Position - StartPos
+
+			UI.Position = UDim2.new(FramePos.X.Scale, FramePos.X.Offset, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)
+			UI.Size = UDim2.new(
+				FrameSize.X.Scale,
+				math.clamp(FrameSize.X.Offset + Delta.X, 360, math.huge),
+				FrameSize.Y.Scale,
+				math.clamp(FrameSize.Y.Offset - Delta.Y, 72, math.huge)
+			)
+		end
+	end))
+end
+
 function Library:Notify(NotificationInfo: NotificationInfo)
 	NotificationInfo = Validate(NotificationInfo, Templates.Notification)
 
@@ -809,6 +863,8 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 	local TabButtons
 	local TabsContainer
 
+	local ResizeButton
+
 	local DialogHolder
 	local DialogFrame
 	local DialogTitle: TextLabel
@@ -876,6 +932,19 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			BackgroundColor3 = "ContainerColor",
 			Position = UDim2.new(0, 0, WindowInfo.TopTabBar and 1 or 0, WindowInfo.TopTabBar and 0 or 32),
 			Size = UDim2.new(1, 0, 1, -74),
+			Parent = MainFrame,
+		})
+
+		--// Resize Button \\-
+		ResizeButton = New("ImageButton", {
+			AnchorPoint = Vector2.new(1, 0),
+			BackgroundTransparency = 1,
+			Image = ResizeIcon and ResizeIcon.Url or "",
+			ImageRectSize = ResizeIcon and ResizeIcon.ImageRectSize or Vector2.zero,
+			ImageRectOffset = ResizeIcon and ResizeIcon.ImageRectOffset or Vector2.zero,
+			ImageTransparency = 0.6,
+			Position = UDim2.new(1, -2, 0, 2),
+			Size = UDim2.fromOffset(20, 20),
 			Parent = MainFrame,
 		})
 
@@ -1148,8 +1217,8 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 				SectionArrow = New("ImageLabel", {
 					AnchorPoint = Vector2.new(1, 0),
 					Image = OpenIcon and OpenIcon.Url or "rbxassetid://105228422307430",
-					ImageRectSize = OpenIcon and OpenIcon.ImageRectSize or 0,
-					ImageRectOffset = OpenIcon and OpenIcon.ImageRectOffset or 0,
+					ImageRectSize = OpenIcon and OpenIcon.ImageRectSize or Vector2.zero,
+					ImageRectOffset = OpenIcon and OpenIcon.ImageRectOffset or Vector2.zero,
 					ImageColor3 = "FillColor",
 					Position = UDim2.fromScale(1, 0),
 					Size = UDim2.fromOffset(WindowInfo.SectionFontSize + 2, WindowInfo.SectionFontSize + 2),
@@ -2462,8 +2531,8 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					BackgroundTransparency = 1,
 					Image = OpenIcon and OpenIcon.Url or "rbxassetid://105228422307430",
 					ImageColor3 = "FillColor",
-					ImageRectSize = OpenIcon and OpenIcon.ImageRectSize or 0,
-					ImageRectOffset = OpenIcon and OpenIcon.ImageRectOffset or 0,
+					ImageRectSize = OpenIcon and OpenIcon.ImageRectSize or Vector2.zero,
+					ImageRectOffset = OpenIcon and OpenIcon.ImageRectOffset or Vector2.zero,
 					Position = UDim2.fromScale(1, 0),
 					Size = UDim2.fromScale(1, 1),
 					SizeConstraint = Enum.SizeConstraint.RelativeYY,
@@ -3618,6 +3687,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 
 	--// Execution \\--
 	Library:MakeDraggable(MainFrame, TitleBar)
+	Library:MakeResizable(MainFrame, ResizeButton)
 
 	if Library.IsMobile then
 		local ToggleButton = New("TextButton", {
