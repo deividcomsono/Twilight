@@ -133,7 +133,7 @@ local MultiDropdown = ShowcaseSec:CreateDropdown("MultiDropdown", {
 	end,
 })
 
-local PlayerDropdown = ShowcaseSec:CreateDropdown("PlayerDropdown1", {
+local PlayerDropdown = ShowcaseSec:CreateDropdown("PlayerDropdown", {
 	Title = "Player Dropdown",
 	SpecialType = "Player",
 	Callback = function(Player: Player)
@@ -141,7 +141,7 @@ local PlayerDropdown = ShowcaseSec:CreateDropdown("PlayerDropdown1", {
 	end,
 })
 
-local MultiPlayerDropdown = ShowcaseSec:CreateDropdown("PlayerDropdown1", {
+local MultiPlayerDropdown = ShowcaseSec:CreateDropdown("MultiPlayerDropdown", {
 	Title = "Multi Player Dropdown",
 	Multi = true,
 	SpecialType = "Player",
@@ -154,7 +154,7 @@ local MultiPlayerDropdown = ShowcaseSec:CreateDropdown("PlayerDropdown1", {
 	end,
 })
 
-local Keypicker = ShowcaseSec:CreateKeypicker("Keypicker1", {
+local Keypicker = ShowcaseSec:CreateKeypicker("Keypicker", {
 	Title = "Keypicker",
 	Keybind = Enum.KeyCode.E,
 	Mode = "Hold", -- Modes: Always, Toggle, Hold | Default is Toggle
