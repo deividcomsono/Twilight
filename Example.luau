@@ -17,6 +17,8 @@ local Window = Library:CreateWindow({
         Font = Font.fromEnum(Enum.Font.Code),
         FontSize = 16,
         SectionFontSize = 18,
+        SectionTitleTransparency = 0.5,
+        ElementTitleTransparency = 0.5,
         MaxDialogButtonsPerLine = 4,
         MaxDropdownItems = 8,
         Theme = nil,
@@ -80,7 +82,7 @@ local Toggle = ShowcaseSec:CreateToggle("Toggle", {
 	Title = "Toggle",
 	Description = "skibid rizz ohio town",
 	Callback = function(Value: boolean)
-		print(" Toggle:", Value)
+		print("Toggle:", Value)
 	end,
 })
 
