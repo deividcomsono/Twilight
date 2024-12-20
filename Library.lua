@@ -92,6 +92,8 @@ local Templates = {
 		Font = Enum.Font.Code,
 		FontSize = 16,
 		SectionFontSize = 18,
+		SectionTitleTransparency = 0.5,
+		ElementTitleTransparency = 0.5,
 		MaxDialogButtonsPerLine = 4,
 		MaxDropdownItems = 8,
 		Theme = Library.Theme,
@@ -165,6 +167,8 @@ export type WindowInfo = {
 	Font: Font,
 	FontSize: number,
 	SectionFontSize: number,
+	SectionTitleTransparency: number,
+	ElementTitleTransparency: number,
 	MaxDialogButtonsPerLine: number,
 	MaxDropdownItems: number,
 	Theme: Themes,
@@ -201,6 +205,8 @@ export type SectionTable = {
 	Show: () -> (),
 	Hide: () -> (),
 	Toggle: () -> (),
+
+	_Tween: TweenBase?,
 }
 
 export type DividerTable = {
@@ -1208,7 +1214,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.new(1, 0, 0, 20),
 					Text = SectionName,
 					TextSize = WindowInfo.SectionFontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.SectionTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextYAlignment = Enum.TextYAlignment.Top,
 					Parent = SectionFrame,
@@ -1250,16 +1256,19 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 
 			function Section:Show()
 				Container.Visible = true
+				SectionButton.TextTransparency = 0
 				SectionArrow.Rotation = 180
 			end
 
 			function Section:Hide()
 				Container.Visible = false
+				SectionButton.TextTransparency = WindowInfo.SectionTitleTransparency
 				SectionArrow.Rotation = 0
 			end
 
 			function Section:Toggle()
 				Container.Visible = not Container.Visible
+				SectionButton.TextTransparency = Container.Visible and 0 or WindowInfo.SectionTitleTransparency
 				SectionArrow.Rotation = Container.Visible and 180 or 0
 			end
 
@@ -1381,7 +1390,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.new(1, 0, 0, 20),
 					Text = ButtonInfo.Title,
 					TextSize = WindowInfo.FontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.ElementTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = ButtonFrame,
 				})
@@ -1448,7 +1457,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 				--// Execution \\--
 				ButtonFrame.MouseEnter:Connect(function()
 					TweenService:Create(ButtonLabel, WindowTweenInfo, {
-						TextTransparency = 0.25,
+						TextTransparency = WindowInfo.ElementTitleTransparency / 2,
 					}):Play()
 					TweenService:Create(Stroke, WindowTweenInfo, {
 						Transparency = 0,
@@ -1456,7 +1465,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 				end)
 				ButtonFrame.MouseLeave:Connect(function()
 					TweenService:Create(ButtonLabel, WindowTweenInfo, {
-						TextTransparency = 0.5,
+						TextTransparency = WindowInfo.ElementTitleTransparency,
 					}):Play()
 					TweenService:Create(Stroke, WindowTweenInfo, {
 						Transparency = 0.75,
@@ -1500,7 +1509,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.new(1, 0, 0, 20),
 					Text = ToggleInfo.Title,
 					TextSize = WindowInfo.FontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.ElementTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = ButtonFrame,
 				})
@@ -1844,6 +1853,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					do
 						local Current = nil
 						local function CreateButton(Mode: string)
+							local _Tween
 							local Button = New("TextButton", {
 								BackgroundTransparency = 1,
 								FontFace = WindowInfo.Font,
@@ -1858,19 +1868,25 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 								if Button.TextTransparency == 0 then
 									return
 								end
-								TweenService:Create(Button, WindowTweenInfo, {
+								_Tween = TweenService:Create(Button, WindowTweenInfo, {
 									TextTransparency = 0.25,
-								}):Play()
+								})
+								_Tween:Play()
 							end)
 							Button.MouseLeave:Connect(function()
 								if Button.TextTransparency == 0 then
 									return
 								end
-								TweenService:Create(Button, WindowTweenInfo, {
+								_Tween = TweenService:Create(Button, WindowTweenInfo, {
 									TextTransparency = 0.5,
-								}):Play()
+								})
+								_Tween:Play()
 							end)
 							Button.MouseButton1Click:Connect(function()
+								if _Tween then
+									_Tween:Cancel()
+									_Tween = nil
+								end
 								Current.TextTransparency = 0.5
 								Current = Button
 								Button.TextTransparency = 0
@@ -2025,7 +2041,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 
 				function Toggle:Display()
 					TweenService:Create(ToggleLabel, WindowTweenInfo, {
-						TextTransparency = Toggle.Value and 0 or 0.5,
+						TextTransparency = Toggle.Value and 0 or WindowInfo.ElementTitleTransparency,
 					}):Play()
 					TweenService:Create(Checkbox, WindowTweenInfo, {
 						BackgroundTransparency = Toggle.Value and 0 or 1,
@@ -2088,7 +2104,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.new(1, 0, 0, 20),
 					Text = SliderInfo.Title,
 					TextSize = WindowInfo.FontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.ElementTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = SliderFrame,
 				})
@@ -2317,7 +2333,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.new(1, 0, 0, 20),
 					Text = InputInfo.Title,
 					TextSize = WindowInfo.FontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.ElementTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = InputFrame,
 				})
@@ -2481,7 +2497,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.fromScale(1, 1),
 					Text = DropdownInfo.Title,
 					TextSize = WindowInfo.FontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.ElementTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = DropdownFrame,
 				})
@@ -2876,7 +2892,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.new(1, 0, 0, 20),
 					Text = KeypickerInfo.Title,
 					TextSize = WindowInfo.FontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.ElementTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = KeypickerFrame,
 				})
@@ -3026,6 +3042,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 				do
 					local Current = nil
 					local function CreateButton(Mode: string)
+						local _Tween
 						local Button = New("TextButton", {
 							BackgroundTransparency = 1,
 							FontFace = WindowInfo.Font,
@@ -3040,19 +3057,25 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 							if Button.TextTransparency == 0 then
 								return
 							end
-							TweenService:Create(Button, WindowTweenInfo, {
+							_Tween = TweenService:Create(Button, WindowTweenInfo, {
 								TextTransparency = 0.25,
-							}):Play()
+							})
+							_Tween:Play()
 						end)
 						Button.MouseLeave:Connect(function()
 							if Button.TextTransparency == 0 then
 								return
 							end
-							TweenService:Create(Button, WindowTweenInfo, {
+							_Tween = TweenService:Create(Button, WindowTweenInfo, {
 								TextTransparency = 0.5,
-							}):Play()
+							})
+							_Tween:Play()
 						end)
 						Button.MouseButton1Click:Connect(function()
+							if _Tween then
+								_Tween:Cancel()
+								_Tween = nil
+							end
 							Current.TextTransparency = 0.5
 							Current = Button
 							Button.TextTransparency = 0
@@ -3200,7 +3223,7 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 					Size = UDim2.new(1, 0, 0, 20),
 					Text = ColorpickerInfo.Title,
 					TextSize = WindowInfo.FontSize,
-					TextTransparency = 0.5,
+					TextTransparency = WindowInfo.ElementTitleTransparency,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					Parent = ColorpickerFrame,
 				})
@@ -3578,6 +3601,30 @@ function Library:CreateWindow(WindowInfo: WindowInfo)
 			end
 
 			--// Execution \\--
+			Container:GetPropertyChangedSignal("Visible"):Connect(function()
+				if Section._Tween then
+					Section._Tween:Cancel()
+					Section._Tween = nil
+				end
+			end)
+			SectionButton.MouseEnter:Connect(function()
+				if Container.Visible then
+					return
+				end
+				Section._Tween = TweenService:Create(SectionButton, WindowTweenInfo, {
+					TextTransparency = WindowInfo.SectionTitleTransparency / 2,
+				})
+				Section._Tween:Play()
+			end)
+			SectionButton.MouseLeave:Connect(function()
+				if Container.Visible then
+					return
+				end
+				Section._Tween = TweenService:Create(SectionButton, WindowTweenInfo, {
+					TextTransparency = WindowInfo.SectionTitleTransparency,
+				})
+				Section._Tween:Play()
+			end)
 			SectionButton.MouseButton1Click:Connect(Section.Toggle)
 
 			return Section
